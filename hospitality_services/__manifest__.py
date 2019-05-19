@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "hospitality_services",
+    'name': "Hospitality Services",
 
     'summary': """
         The Suite Life of NYC 1""",
@@ -23,9 +23,10 @@
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
+        'views/shipping_view.xml'
     ],
     # only loaded in demonstration mode
     'demo': [
