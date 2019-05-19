@@ -29,48 +29,47 @@ class shipping_service(models.Model):
     weight_value = fields.Float()
 
     cost = fields.Float(compute="get_rates", store=True)
-    
-@api.depends('from_name')
-def get_rates(self):
-    payload = {
-        "shipment": {
-            "service_code": "usps_first_class_mail",
-            "ship_to": {
-            "name": self.to_name,
-            "address_line1": self.to_address_line1,
-            "city_locality": self.to_city,
-            "state_province": self.to_state,
-            "postal_code": self.to_postal_code,
-            "country_code": self.to_country_code
-            },
-            "ship_from": {
-            "name": self.from_name,
-            "address_line1": self.from_address_line1,
-            "city_locality": self.from_city,
-            "state_province": self.from_state,
-            "postal_code": self.from_postal_code,
-            "country_code": self.from_country_code
-            },
-            "packages": [
-            {
-                "weight": {
-                "value": self.weight_value,
-                "unit": "pound"
+        
+    @api.depends('from_name')
+    def get_rates(self):
+        payload = {
+            "shipment": {
+                "service_code": "usps_first_class_mail",
+                "ship_to": {
+                "name": self.to_name,
+                "address_line1": self.to_address_line1,
+                "city_locality": self.to_city,
+                "state_province": self.to_state,
+                "postal_code": self.to_postal_code,
+                "country_code": self.to_country_code
+                },
+                "ship_from": {
+                "name": self.from_name,
+                "address_line1": self.from_address_line1,
+                "city_locality": self.from_city,
+                "state_province": self.from_state,
+                "postal_code": self.from_postal_code,
+                "country_code": self.from_country_code
+                },
+                "packages": [
+                {
+                    "weight": {
+                    "value": self.weight_value,
+                    "unit": "pound"
+                    }
                 }
+                ]
+            },
+            "rate_options": {
+                "carrier_ids": [
+                "se-133869"
+                ]
             }
-            ]
-        },
-        "rate_options": {
-            "carrier_ids": [
-            "se-133869"
-            ]
         }
-    }
-    r = requests.post(self.api_url_rates, headers = self.headers, data = json.dumps(payload))
-    json1_data = json.loads(r.text)
-    all_costs = []
-    for rate in json1_data["rate_response"]["rates"]:
-      all_costs.append(float(rate["shipping_amount"]["amount"]))
+        r = requests.post(self.api_url_rates, headers = self.headers, data = json.dumps(payload))
+        json1_data = json.loads(r.text)
+        all_costs = []
+        for rate in json1_data["rate_response"]["rates"]:
+        all_costs.append(float(rate["shipping_amount"]["amount"]))
 
-    self.cost = (min(all_costs))
-    self.cost = 28.5
+        self.cost = (min(all_costs))
